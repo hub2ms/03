@@ -21,6 +21,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #fafaf9; /* Mild stone color */
             color: #000000;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
         }
 
         /* Animations */
@@ -33,10 +34,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Dynamic Slow Motion Menu Effect */
+        /* Dynamic Menu Effect (Parallax on Hover) */
         .nav-link {
             position: relative;
-            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.1s ease-out, color 0.3s;
+            will-change: transform;
         }
         .nav-link:hover {
             transform: translateY(-3px) scale(1.05);
@@ -60,7 +62,7 @@
             color: #2563eb;
         }
 
-        /* Multi-color Dynamic Title Animation */
+        /* Multi-color Dynamic Title Text Animation */
         .dynamic-title {
             background: linear-gradient(to right, #ef5350, #ab47bc, #2196f3, #009688, #ffeb3b, #ff9800, #f44336);
             background-size: 300% 100%;
@@ -72,6 +74,64 @@
         @keyframes rainbow_move {
             0% { background-position: 0% 50%; }
             100% { background-position: 100% 50%; }
+        }
+
+        /* --- Dynamic Multi-Color Clockwise Border Animation --- */
+        .rainbow-border-box {
+            position: relative;
+            z-index: 0;
+            overflow: hidden;
+            border-radius: 1rem; /* Match rounded-2xl roughly */
+            background: white; /* Ensure background is white */
+        }
+        /* The rotating gradient background */
+        .rainbow-border-box::before {
+            content: '';
+            position: absolute;
+            z-index: -2;
+            left: -50%;
+            top: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                #ff0000, 
+                #ff7f00, 
+                #ffff00, 
+                #00ff00, 
+                #0000ff, 
+                #4b0082, 
+                #8f00ff, 
+                #ff0000
+            );
+            animation: rotate 4s linear infinite;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease;
+        }
+        /* Only show on hover for general elements if needed, or always */
+        .rainbow-hover:hover::before {
+            opacity: 1;
+        }
+        .rainbow-always::before {
+            opacity: 1;
+        }
+        
+        /* The inner white masking to create the border effect */
+        .rainbow-border-box::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            left: 3px; /* Border thickness */
+            top: 3px;
+            width: calc(100% - 6px);
+            height: calc(100% - 6px);
+            background: white;
+            border-radius: calc(1rem - 3px);
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(1turn);
+            }
         }
 
         /* Tab Logic */
@@ -117,27 +177,27 @@
         }
     </style>
 </head>
-<body class="bg-stone-50 text-black flex flex-col min-h-screen font-inter">
+<body class="bg-stone-50 text-black flex flex-col min-h-screen font-inter" onmousemove="animateMenu(event)">
 
     <!-- Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-24 items-center">
                 <!-- Logo / Company Name Area -->
-                <div class="flex flex-col cursor-pointer group" onclick="switchTab('home')">
+                <div class="flex flex-col cursor-pointer group nav-item-dynamic" onclick="switchTab('home')">
                     <h1 class="text-2xl font-bold text-black leading-none tracking-tight group-hover:text-blue-700 transition-colors duration-500">MOONSHOT FINSERV</h1>
                     <p class="text-sm text-blue-600 font-medium mt-1">Your Empathic Mutual Fund Partner</p>
                 </div>
 
                 <!-- Desktop Menu -->
                 <div class="hidden lg:flex items-center space-x-6">
-                    <button onclick="switchTab('home')" class="nav-link font-medium py-2 active-nav">Home</button>
-                    <button onclick="switchTab('about')" class="nav-link font-medium py-2">About</button>
-                    <button onclick="switchTab('calculators')" class="nav-link font-medium py-2">Calculators</button>
-                    <button onclick="switchTab('customers')" class="nav-link font-medium py-2">Customers</button>
-                    <button onclick="switchTab('compliance')" class="nav-link font-medium py-2">Compliance</button>
-                    <button onclick="switchTab('career')" class="nav-link font-medium py-2">Career</button>
-                    <button onclick="switchTab('contact')" class="nav-link font-medium py-2">Contact</button>
+                    <button onclick="switchTab('home')" class="nav-link font-medium py-2 active-nav nav-item-dynamic">Home</button>
+                    <button onclick="switchTab('about')" class="nav-link font-medium py-2 nav-item-dynamic">About</button>
+                    <button onclick="switchTab('calculators')" class="nav-link font-medium py-2 nav-item-dynamic">Calculators</button>
+                    <button onclick="switchTab('customers')" class="nav-link font-medium py-2 nav-item-dynamic">Customers</button>
+                    <button onclick="switchTab('compliance')" class="nav-link font-medium py-2 nav-item-dynamic">Compliance</button>
+                    <button onclick="switchTab('career')" class="nav-link font-medium py-2 nav-item-dynamic">Career</button>
+                    <button onclick="switchTab('contact')" class="nav-link font-medium py-2 nav-item-dynamic">Contact</button>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -184,7 +244,6 @@
                             Check Your Family's Financial Security Score
                         </h2>
                         <div class="relative w-full overflow-hidden rounded-xl shadow-lg border-2 border-blue-100 bg-white">
-                            <!-- Cleaned up double iframe tag -->
                             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeufpQRFI4HQOtvG9kBwhkaR0kFGt9sbNkinubFX45QkDD49w/viewform?embedded=true" width="100%" height="1310" frameborder="0" marginheight="0" marginwidth="0" style="min-height: 800px;">Loading…</iframe>
                         </div>
                     </div>
@@ -202,58 +261,53 @@
                 </div>
 
                 <div class="grid lg:grid-cols-2 gap-12 items-center h-full">
-                    <!-- Left: Portrait Image (Centered Vertically) -->
+                    <!-- Left: Portrait Image (Centered Middle, No Caption) -->
                     <div class="flex justify-center h-full items-center">
-                        <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white max-w-sm w-full">
-                            <img src="Moonshot_Portrait.png" alt="Moonshot Finserv" class="w-full h-auto object-cover" onerror="this.src='Moonshot_Portrait.jpg'">
+                        <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white max-w-sm w-full transition-transform hover:scale-105 duration-500">
+                            <!-- Filename as requested: Moonshot_Portrait.png -->
+                            <img src="Moonshot_Portrait.png" alt="Moonshot Finserv" class="w-full h-auto object-cover" onerror="this.src='Moonshot_Portrait.jpg'"> 
                         </div>
                     </div>
 
                     <!-- Right: Content -->
-                    <div class="space-y-10">
+                    <div class="space-y-8">
                         
                         <!-- 1. Purpose -->
                         <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 hover:shadow-xl transition-all">
-                            <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
-                                <i class="fas fa-bullseye text-blue-600"></i> Our Purpose
-                            </h3>
-                            <p class="text-lg text-slate-700 font-medium">"We help your family dream big financially."</p>
-                            <p class="text-lg text-slate-700 font-medium">"We help your family start smart financially."</p>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">OUR PURPOSE</h3>
+                            <p class="text-lg text-slate-700 italic">"We help your family dream big financially."</p>
+                            <p class="text-lg text-slate-700 italic">"We help your family start smart financially."</p>
                         </div>
 
                         <!-- 2. Vision -->
                         <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500 hover:shadow-xl transition-all">
-                            <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fas fa-eye text-purple-600"></i> Our Vision
-                            </h3>
-                            <p class="text-lg text-slate-700 mb-4">"To empower clients to achieve financial goals through mutual fund investment."</p>
+                            <h3 class="text-xl font-bold text-slate-800 mb-4">OUR VISION</h3>
+                            <p class="text-lg text-slate-700 mb-4 italic">"To empower clients to achieve financial goals through mutual fund investment."</p>
                             
-                            <!-- Vision Goals Icons -->
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-car text-red-500"></i> New Vehicle</div>
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-home text-green-500"></i> Dream Home</div>
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-graduation-cap text-blue-500"></i> Children's Education</div>
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-rings-wedding text-pink-500"></i> Marriage Expenses</div>
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-plane-departure text-orange-500"></i> Family Vacation</div>
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-gift text-purple-500"></i> Gifting</div>
-                                <div class="flex items-center gap-2 text-slate-600"><i class="fas fa-umbrella-beach text-teal-500"></i> Retirement Planning</div>
+                            <!-- Vision Goals Icons (Italic text) -->
+                            <div class="grid grid-cols-2 gap-4 text-sm italic text-slate-600">
+                                <div class="flex items-center gap-2"><i class="fas fa-car text-red-500"></i> New Vehicle</div>
+                                <div class="flex items-center gap-2"><i class="fas fa-home text-green-500"></i> Dream Home</div>
+                                <div class="flex items-center gap-2"><i class="fas fa-graduation-cap text-blue-500"></i> Children's Education</div>
+                                <div class="flex items-center gap-2"><i class="fas fa-rings-wedding text-pink-500"></i> Marriage Expenses</div>
+                                <div class="flex items-center gap-2"><i class="fas fa-plane-departure text-orange-500"></i> Family Vacation</div>
+                                <div class="flex items-center gap-2"><i class="fas fa-gift text-purple-500"></i> Gifting</div>
+                                <div class="flex items-center gap-2"><i class="fas fa-umbrella-beach text-teal-500"></i> Retirement Planning</div>
                             </div>
                         </div>
 
                         <!-- 3. Mission -->
                         <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-yellow-500 hover:shadow-xl transition-all">
-                            <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
-                                <i class="fas fa-rocket text-yellow-600"></i> Our Mission
-                            </h3>
-                            <p class="text-xl text-slate-800 font-bold">"To be client's Empathic Mutual Fund Partner in balancing Risk and Reward."</p>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">OUR MISSION</h3>
+                            <p class="text-xl text-slate-800 italic">"To be client's Empathic Mutual Fund Partner in balancing Risk and Reward."</p>
                         </div>
 
                         <!-- 4. Why Choose Us -->
                         <div class="bg-gradient-to-r from-blue-900 to-slate-900 rounded-xl p-8 text-white shadow-xl">
-                            <h3 class="text-xl font-bold mb-4 border-b border-blue-500 pb-2 inline-block">Why choose Moonshot Finserv?</h3>
+                            <h3 class="text-xl font-bold mb-4 border-b border-blue-500 pb-2 inline-block">WHY MOONSHOT FINSERV?</h3>
                             <div class="space-y-3">
                                 <p class="text-xl font-light italic">"We make investing Simple & Affordable."</p>
-                                <p class="text-2xl font-bold text-yellow-400">"You can start SIP with just ₹100."</p>
+                                <p class="text-2xl font-bold text-yellow-400 italic">"You can start SIP with just ₹100."</p>
                             </div>
                         </div>
 
@@ -375,18 +429,21 @@
         <!-- CAREER PAGE -->
         <div id="career" class="tab-content animate-fade-in">
             <div class="max-w-3xl mx-auto px-4 py-16">
-                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center border border-slate-100">
-                    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                        <i class="fas fa-briefcase text-yellow-600 text-3xl"></i>
-                    </div>
-                    <h2 class="text-3xl font-bold mb-4">Join Our Team</h2>
-                    <div class="text-slate-700 mb-8 font-bold text-lg leading-relaxed">
-                        <p>Passionate about wealth creation through mutual funds?</p>
-                        <p class="text-blue-600 mt-1">Join Moonshot Finserv as an intern!</p>
-                    </div>
-                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-                        <h3 class="font-bold text-lg mb-2">Share your profile</h3>
-                        <a href="mailto:hub2ms@gmail.com" class="text-blue-600 font-bold text-xl hover:underline">hub2ms@gmail.com</a>
+                <!-- Added rainbow-hover class for hover effect on border -->
+                <div class="rainbow-border-box rainbow-hover p-1">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center border border-slate-100 h-full">
+                        <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                            <i class="fas fa-briefcase text-yellow-600 text-3xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-4">Join Our Team</h2>
+                        <div class="text-slate-700 mb-8 font-bold text-lg leading-relaxed">
+                            <p>Passionate about wealth creation through mutual funds?</p>
+                            <p class="text-blue-600 mt-1">Join Moonshot Finserv as an intern!</p>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+                            <h3 class="font-bold text-lg mb-2">Share your profile</h3>
+                            <a href="mailto:hub2ms@gmail.com" class="text-blue-600 font-bold text-xl hover:underline">hub2ms@gmail.com</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -395,51 +452,34 @@
         <!-- CONTACT PAGE -->
         <div id="contact" class="tab-content animate-fade-in">
             <div class="max-w-7xl mx-auto px-4 py-16">
-                <div class="bg-white rounded-2xl shadow-xl p-8 lg:p-12 border border-slate-100">
-                    <h2 class="text-3xl font-bold mb-8 text-center">Get in Touch</h2>
-                    
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <!-- Email -->
-                        <div class="flex items-center gap-4 group p-4 rounded-xl hover:bg-blue-50 transition-colors">
-                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-red-200 transition-colors">
-                                <i class="fas fa-envelope text-red-500 text-xl"></i>
-                            </div>
-                            <div>
+                <div class="rainbow-border-box rainbow-hover p-1">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 lg:p-12 border border-slate-100">
+                        <h2 class="text-3xl font-bold mb-8 text-center">Get in Touch</h2>
+                        
+                        <div class="flex flex-col items-center gap-8">
+                            <div class="text-center space-y-2">
+                                <i class="fas fa-envelope text-red-500 text-3xl mb-2"></i>
                                 <p class="text-sm text-slate-500 font-medium">Email Us</p>
                                 <a href="mailto:hub2ms@gmail.com" class="text-lg font-bold text-black hover:text-blue-600 transition">hub2ms@gmail.com</a>
                             </div>
-                        </div>
 
-                        <!-- Mobile -->
-                        <div class="flex items-center gap-4 group p-4 rounded-xl hover:bg-green-50 transition-colors">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                                <i class="fas fa-phone-alt text-green-600 text-xl"></i>
-                            </div>
-                            <div>
+                            <div class="text-center space-y-2">
+                                <i class="fas fa-phone-alt text-green-600 text-3xl mb-2"></i>
                                 <p class="text-sm text-slate-500 font-medium">Call Us</p>
                                 <a href="tel:8939124816" class="text-lg font-bold text-black hover:text-blue-600 transition">8939 124 816</a>
                             </div>
-                        </div>
 
-                        <!-- WhatsApp -->
-                        <div class="flex items-center gap-4 group p-4 rounded-xl hover:bg-green-50 transition-colors">
-                            <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition-colors">
-                                <i class="fab fa-whatsapp text-green-500 text-2xl"></i>
-                            </div>
-                            <div>
+                            <div class="text-center space-y-2">
+                                <i class="fab fa-whatsapp text-green-500 text-4xl mb-2"></i>
                                 <p class="text-sm text-slate-500 font-medium">Chat with us</p>
                                 <a href="https://wa.me/+918939124816" target="_blank" class="text-lg font-bold text-black hover:text-blue-600 transition">WhatsApp Now</a>
                             </div>
-                        </div>
 
-                        <!-- Location -->
-                        <div class="flex items-center gap-4 group p-4 rounded-xl hover:bg-blue-50 transition-colors">
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-                                <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
-                            </div>
-                            <div>
+                            <div class="text-center space-y-2">
+                                <i class="fas fa-map-marker-alt text-blue-600 text-3xl mb-2"></i>
                                 <p class="text-sm text-slate-500 font-medium">Location</p>
                                 <p class="text-lg font-bold text-black">Erode, India</p>
+                                <!-- Map text link only, no preview -->
                                 <a href="https://maps.app.goo.gl/QnLKbGPgBcz7G2C6A" target="_blank" class="inline-flex items-center gap-2 mt-1 text-sm font-semibold text-blue-600 hover:underline">
                                     <i class="fas fa-external-link-alt"></i> Visit office (Maps)
                                 </a>
@@ -494,12 +534,11 @@
 
     <!-- Logic -->
     <script>
-        // --- Navigation Logic ---
+        // --- Navigation Logic (With Slow Motion Effect) ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             
-            // Update Desktop Nav
             document.querySelectorAll('.nav-link').forEach(btn => {
                 btn.classList.remove('active-nav');
                 if(btn.textContent.toLowerCase().trim() === tabId) {
@@ -511,6 +550,17 @@
 
         function toggleMobileMenu() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // --- Slow Motion Menu Movement ---
+        function animateMenu(e) {
+            const navItems = document.querySelectorAll('.nav-item-dynamic');
+            const x = (window.innerWidth - e.pageX) / 100;
+            const y = (window.innerHeight - e.pageY) / 100;
+
+            navItems.forEach(item => {
+                item.style.transform = `translateX(${x}px) translateY(${y}px)`;
+            });
         }
 
         // --- Format Currency ---
@@ -700,7 +750,7 @@
 
         // --- 20 Testimonials Data (Specific names and locations) ---
         const testimonials = [
-            { name: "Sudha", loc: "Erode", msg: "Moonshot Finserv helped me plan my finances better.", rating: 5 },
+            { name: "Mythili", loc: "Erode", msg: "Moonshot Finserv helped me plan my finances better.", rating: 5 },
             { name: "Prathikshaa", loc: "Erode", msg: "Professional and trustworthy advice for my investments.", rating: 5 },
             { name: "Arun", loc: "Tiruppur", msg: "Started my SIP journey here, great experience.", rating: 5 },
             { name: "Bharani", loc: "Karur", msg: "Clear guidance on wealth creation strategies.", rating: 5 },
@@ -725,18 +775,20 @@
         function renderTestimonials() {
             const container = document.getElementById('testimonials-grid');
             container.innerHTML = testimonials.map(t => `
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 hover:shadow-lg transition-shadow duration-300">
-                    <div class="flex text-yellow-400 mb-3">
-                        ${'<i class="fas fa-star"></i>'.repeat(t.rating)}
-                    </div>
-                    <p class="text-slate-600 mb-4 italic">"${t.msg}"</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600">
-                            ${t.name.charAt(0)}
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 hover:shadow-lg transition-shadow duration-300 testimonial-card rainbow-border-box rainbow-hover p-1">
+                    <div class="h-full bg-white rounded-xl p-4">
+                        <div class="flex text-yellow-400 mb-3">
+                            ${'<i class="fas fa-star"></i>'.repeat(t.rating)}
                         </div>
-                        <div>
-                            <p class="font-bold text-black text-sm">${t.name}</p>
-                            <p class="text-xs text-slate-500"><i class="fas fa-map-marker-alt mr-1"></i>${t.loc}</p>
+                        <p class="text-slate-600 mb-4 italic">"${t.msg}"</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600">
+                                ${t.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-bold text-black text-sm">${t.name}</p>
+                                <p class="text-xs text-slate-500"><i class="fas fa-map-marker-alt mr-1"></i>${t.loc}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
